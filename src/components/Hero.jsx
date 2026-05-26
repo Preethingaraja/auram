@@ -1,9 +1,17 @@
-import React from 'react'
-import { motion } from 'framer-motion'
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Gift, Package, Trophy, Award, Clock, Sparkles,
   ArrowRight, Star
 } from 'lucide-react'
+
+const heroSlides = [
+  { src: '/images/hero_slide_1.png', alt: 'Premium luxury gift box' },
+  { src: '/images/hero_slide_2.png', alt: 'Seasonal festive gifts arrangement' },
+  { src: '/images/hero_slide_3.png', alt: 'Corporate executive gift set' },
+  { src: '/images/hero_slide_4.png', alt: 'Custom laser engraved trophy' },
+  { src: '/images/hero_slide_5.png', alt: 'Premium designer wall clock' },
+]
 
 const floatingIcons = [
   { Icon: Gift,     size: 'w-12 h-12', pos: 'top-24 left-[5%]',   cls: 'float-1', opacity: 'opacity-20' },
@@ -23,6 +31,14 @@ const scrollToSection = (id) => {
 }
 
 export default function Hero() {
+  const [slideIndex, setSlideIndex] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSlideIndex((prev) => (prev + 1) % heroSlides.length)
+    }, 2000)
+    return () => clearInterval(timer)
+  }, [])
   return (
     <section
       id="home"
@@ -164,23 +180,31 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
           className="flex-1 w-full max-w-sm lg:max-w-none flex items-center justify-center"
         >
-          <div className="relative w-full max-w-md">
-            {/* Glow blob */}
+          {/* Image wrapper — overflow-hidden clips glow and badges */}
+          <div className="relative w-full max-w-md overflow-visible">
+            {/* Glow blob — contained within wrapper */}
             <div
-              className="absolute -inset-6 rounded-3xl opacity-40 blur-3xl"
+              className="absolute inset-0 rounded-3xl opacity-40 blur-3xl"
               style={{ background: 'radial-gradient(circle, #F5C518 0%, #8B1A6B 60%, transparent 100%)' }}
               aria-hidden="true"
             />
             {/* Image frame */}
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-              <img
-                src="/images/hero_gifts.png"
-                alt="Premium gift hampers by Auram"
-                className="w-full h-auto object-cover"
-                loading="eager"
-              />
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/10 aspect-[4/5] sm:aspect-square lg:aspect-[4/5] bg-brand-magenta/5">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={slideIndex}
+                  src={heroSlides[slideIndex].src}
+                  alt={heroSlides[slideIndex].alt}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="eager"
+                />
+              </AnimatePresence>
               {/* Subtle overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-magenta/20 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-magenta/20 to-transparent pointer-events-none z-10" />
             </div>
 
             {/* Floating badge top left (hidden on small screens) */}
